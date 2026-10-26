@@ -1,0 +1,191 @@
+The Fiduci Prime Lens
+
+A formal specification, proof ledger, and research agenda
+
+Authorial framework: Joe Smith / Fiduci Group, as identified in the supplied series.
+Formalized from: the material supplied in this conversation and the four accompanying Fiduci Prime Lens PDFs.
+Editorial date: 26 October 2026.
+Scope: natural numbers, prime candidates, exact primality testing, the visual and symbolic instruments, and the connection to the Fiduci/fidbit encoding. This is an exposition and audit of the proposed methodology, not a claim that its classical mathematical facts were first discovered here.
+
+The governing distinction
+
+  A prime is a seat no smaller prime has reached. Addresses are exact; identity must be established.
+
+In ordinary integer arithmetic, an integer n > 1 is prime if its only positive divisors are 1 and n; otherwise it is composite. The Fiduci Prime Lens presents this as a sieve: a candidate is an address, and a prime is a surviving occupant. Its distinctive contribution, as a framework, lies in its names, coupled registers, visual instruments, visible trial count, and insistence on documenting failed patterns. These do not change the conventional definition of a prime.
+
+Here and below, PROVED denotes a theorem established by the argument given; TESTED denotes a finite computation, never a universal proof; DEFINED denotes a convention or representation; OPEN denotes a claim whose precise statement or proof is not yet supplied; and CORRECTED identifies a necessary qualification of the source wording.
+
+1. Fi, Du, Ci: the address register
+
+For positive integer n, the three consecutive forms are
+
+Fi_(n) = 3n − 2 ≡ 1 (mod  3),   Du_(n) = 3n − 1 ≡ 2 (mod  3),   Ci_(n) = 3n ≡ 0 (mod  3).
+
+Fi is the point column, Du the line column, and Ci the triangle/Fid column in the shape vocabulary. The three columns partition the positive integers by remainder modulo 3. Ci contains 3 itself and no prime greater than 3. The names and geometric interpretations are DEFINED; the divisibility conclusion is PROVED.
+
+The candidate selector supplied with the framework is
+
+C_n = 3n - (3 - (-1)^n)/2, for n >= 2.
+
+It yields 5, 7, 11, 13, 17, 19, …. For even n = 2k, C_(n) = 6k − 1; for odd n = 2k + 1, C_(n) = 6k + 1. Thus it enumerates all integers greater than 3 coprime to 6, not all primes. The increments alternate  + 2,  + 4, beginning 5 → 7 → 11. The first composite in the sequence is 25. The smaller primes 2 and 3 are handled separately. PROVED.
+
+In the six-wide grid, the two survivor columns are 6k − 1 and 6k + 1. For n > 3, primality implies oddness and nondivisibility by 3, hence membership in one of those lanes. The reverse fails: 25, 35, 49, 55, and many others have valid addresses but are composite. “Prime slot” in this manuscript always means candidate location, not a primality verdict.
+
+2. Tri-parity and the two walls
+
+The terms Even, Odd, and Fid (divisible by 3, from fiducia) are a working grammar. They are not three mutually exclusive mathematical parity classes: 9 is both Odd and Fid, and 6 is both Even and Fid. Standard parity remains the disjoint Odd/Even split; Fid is an additional, overlapping divisibility flag. The candidate condition is precisely
+
+Odd(n) ∧ ¬Fid(n)  ⇔  n ≡ 1 or 5 (mod  6).
+
+This is the operational reading of the Chinese remainder correspondence ℤ/6ℤ ≅ ℤ/2ℤ × ℤ/3ℤ. In every block of six integers, three are even, one more is odd and divisible by 3, and two survive; the walls reject four of six addresses, an exact density of two-thirds. For a bounded input range, the precise count depends on endpoints. A composite rejected by a wall has zero candidate-divisor interviews, though checking parity or a digit sum is still computational work. PROVED.
+
+The digit-sum rule is exact because 10 ≡ 1 (mod  3). If n = ∑_(i)a_(i)10^(i), then n ≡ ∑_(i)a_(i) (mod  3). A digit sum divisible by 3 convicts n > 3 with factor 3; a nonzero remainder only determines its Fi or Du address. Digit sums can be repeated until the result is at most 32. Each step preserves the remainder modulo 3, not parity or primality. This under-32 value is a glance, never a certificate. PROVED.
+
+The proposed direct table for 0 through 32 contains the exceptional primes 2 and 3 and the additional primes 5, 7, 11, 13, 17, 19, 23, 29, 31; 0 and 1 are neither prime nor composite. In the interval 5–31, 25 is the sole composite that is odd and non-Fid. This is a bounded fact, not an oracle for inputs whose digit sums reduce into that interval. In particular, a prime may have glance value 25 (997 does), and a composite may reduce to 7 (25 does). A table lookup and a trial division are distinct operations and must not be conflated in the interview count.
+
+Examples, independently recalculated:
+
+              Input Digit-sum chain   Exact disposition
+  ----------------- ----------------- ----------------------------------------------------------------------
+                 25 7                 Candidate address; composite 5 × 5
+            486,385 34 → 7            Candidate address; composite 5 × 97, 277
+          1,000,001 2                 Candidate address; composite 101 × 9, 901
+                997 25                Prime, despite its composite-looking glance
+    999,999,999,989 107 → 8           Prime after complete lane-candidate division through its square root
+
+The earlier chain “999,999,999,989 → 98 → 17” was an arithmetic error. Its corrected chain does not alter the primality verdict. The descriptions “Fi/Du prime slot” and “under-32 near-oracle” should be read only as statements about candidate addresses, never as claims about the original integer’s identity. CORRECTED.
+
+3. The deterministic five-gate calculator
+
+Gate 0 — Pre-forms. For whole-number input, 0 denotes absence and 1 the unit/point; in ℤ, neither is prime nor composite. The number 2 is prime and the sole even prime; 3 is prime and the sole Ci/Fid prime. Negative integers are outside the stated whole-number input domain. The shape words are DEFINED, the integer verdicts PROVED.
+
+Gate 1 — The ×2 wall. If n > 2 is even, return composite and factor 2.
+
+Gate 2 — The ×3 wall. If n > 3 is divisible by 3 (possibly recognized by digit sum), return composite and factor 3. Either wall returns before the interview.
+
+Gate 3 — The address. The survivor lies in 6k ± 1; record Fi/Du and optionally its class modulo 24. This is an exact filter, not a verdict.
+
+Gate 4 — The interview. Visit 5, 7, 11, 13, … in increasing order, stopping at d² > n or the first d ∣ n. Each visit is an actual divisibility operation and increments a displayed interview counter. A hit returns composite, its smallest prime factor d, and cofactor n/d. If all visits clear, return prime. Trial candidates need not themselves be established primes: a composite divisor such as 25 is harmless to test; if some candidate divides, the least dividing candidate reached in this order is necessarily prime, because its smaller prime factor would have been visited first. PROVED.
+
+Why the stopping rule works: every composite n = ab, with 1 < a ≤ b, has a <= sqrt(n); some prime factor of a is no larger. After the two walls, such a factor must occur in a 6k ± 1 lane. No hit by sqrt(n) is therefore an exact proof of primality. Integer arithmetic can implement the bound as d² ≤ n to avoid rounding a floating-point square root. PROVED.
+
+There are three presentation labels, but only the usual integer statuses: true prime; composite caught at a wall; and honorary prime, defined internally as a composite which passed the cheap walls and was caught in the interview (25 is the canonical first example). “Honorary” confers no mathematical prime status. For each result the UI can display two adjacent descriptions, one conventional (prime/composite/neither) and one in the shape vocabulary (atom/member/pre-form). The convention for 0, 1, 2, and 3 must be explicit; not every input can have a prime-or-composite landing.
+
+An optional precomputed lookup through 32 can be used as a fast path, with factor certificates stored for composites. Its counter must then say “0 interviews; table lookup” rather than imply that the standard interview was run. Alternatively, perform the interview for those lane inputs as well. Show the actual number of tests, not an estimated complexity or a hidden average.
+
+The described browser calculator is a single-file, offline, deterministic instrument with digit-sum bookkeeping, dual verdicts, and a displayed count. Its stated upper input cap is 999,999,999,999 (inputs above this are refused). This is an implementation policy, not a mathematical limit on the algorithm. Assertions that a particular implementation is sub-second, cross-checked “10,000 of 10,000” for inputs 2–10,000, or exhaustively validated at larger scales require its code, exact range, hardware, and test log. The inclusive range 2–10,000 has 9,999, not 10,000, inputs. We independently ran the formalized five-gate algorithm against blunt trial division for those 9,999 inputs, with agreement in every case; and compared every input 0–1,000,000 against an independent Eratosthenes sieve (1,000,001 verdicts, 0 mismatches). These finite tests support the implementation of the stated mathematics but are not universal proofs.
+
+Selected runs under the counting convention above (without the optional small-number table):
+
+              Input Verdict                  Candidate interviews   First factor, if any
+  ----------------- ---------------------- ---------------------- ----------------------
+                 25 Composite / honorary                        1                      5
+                211 Prime                                       4                      —
+                437 Composite / honorary                        6                     19
+    2,207 = 47² − 2 Prime                                      14                      —
+            486,385 Composite / honorary                        1                      5
+          1,000,001 Composite / honorary                       33                    101
+    999,999,999,989 Prime                                 333,332                      —
+
+The last result was checked by enumerating every lane candidate through floor(sqrt(n)) = 999,999; it is a finite exact primality certificate by exhaustive division in that range, not a timing claim. The implementation’s time increases with the number of candidate divisors up to O(sqrt(n)), roughly sqrt(n)/3 worst-case interviews after the walls; the input bit length is only log₂n.
+
+4. Shadows, first flaw, and the no-floor theorem
+
+Call a composite in a 6k ± 1 lane a shadow or honorary candidate. Label it by its smallest prime factor, e.g. 25·5, 35·5, 49·7, 121·11. The multiplication marks are tags, not multiplication notation within the numeral. The first lane composite greater than 3 is 25. Thus “25 remains the first flaw” is correct for the fixed two-wall filter and its ordered candidate sequence, not for every conceivable wheel (a wheel also filtering by 5 no longer admits it). PROVED with scope.
+
+First new shadow theorem. If earlier, smaller-prime crossings are already applied, a prime p ≥ 5 contributes its first previously unremoved multiple at p². For a smaller multiple mp with 2 ≤ m < p, the number m has a prime factor q < p; hence mp was crossed by q. At p², no smaller prime factor exists. This is the precise sieve meaning of “each prime casts its first shadow at its square.” It does not mean p² is the first literal multiple of p in a survivor lane: 35 is a lane multiple of 7 before 49, already claimed by 5. PROVED and CORRECTED.
+
+Finite-guard validity. If every prime below p is guarded and p is the first unguarded prime, every surviving integer 2 ≤ n < p² is prime: otherwise it would have a guarded prime factor at most sqrt(n) < p. But p² survives the fixed guards and is composite. The two walls {2,3} are exact on survivors from 2 through 24 and first fail at 25; adding 5 moves the first possible failure to 49; adding 7 moves it to 121. These are the exclusive upper bounds. PROVED.
+
+In particular, no fixed finite set of prime-divisibility guards can certify primality for arbitrarily large survivors. Euclid guarantees a prime p outside that set, and p² defeats it. This “no floor” statement is about fixed guards or fixed wheels, not all finite descriptions of algorithms. The five-gate method itself is a finite rule whose number of interviews grows with input. PROVED with scope.
+
+Nonperiodicity, precisely stated. The complete prime/composite indicator is not eventually periodic with any fixed positive period T. Suppose it were from some threshold onward. Choose a prime p above that threshold. Periodicity would make p + pT = p(1+T) prime, although it is composite. This is a proof of nonperiodicity of the verdict pattern, not a proof that no finite algorithm or short primality method exists. A sieve with a fixed finite guard set is periodic modulo the product of those guards; the completed prime verdict is not. PROVED.
+
+The recorded guard-twin alternation was an observed finite pattern, not a law. At p = 47, 47² − 2 = 2, 207 is prime; no candidate factor through floor(sqrt(2,207)) = 46 divides it. Preserve the counterexample and specify the proposed alternation’s exact indexed sequence before claiming more about where it began or how many cases it covered. TESTED for the instance; conjecture rejected.
+
+5. The octet, wheel spellings, and dual register
+
+Within 1–24, the odd integers not divisible by 3 are exactly
+
+U(24) = {1, 5, 7, 11, 13, 17, 19, 23}.
+
+They are the eight invertible residue classes modulo 24—the octet, derived by applying both vetoes. Under multiplication modulo 24 they form a group isomorphic to C₂ × C₂ × C₂: each listed residue squares to 1 modulo 24. This applies to the eight units, not to all 24 residue classes or all integers. Unique residue addresses are not unique prime-factorization names; those are distinct facts. PROVED.
+
+Every prime p > 3 has p² ≡ 1 (mod  24): oddness gives 1 mod 8, and nondivisibility by 3 gives 1 mod 3, hence 1 mod 24 by CRT. The statement is false for the exceptional prime 3 (3² = 9), and the corresponding claim for p = 2 also fails. For p > 3, p² + 2 ≡ 0 (mod  3), while p² − 2 ≡ 5 (mod  6) survives the two walls. The latter is only a candidate, as the instance 2,207 illustrates; it has no general composite or prime verdict. PROVED.
+
+Three ways of writing the survivor wheel are retained as design spellings:
+
+1.  Positional: in base twelve, a number coprime to 6 ends in one of 1, 5, 7, or the digit eleven (written Ɛ in the supplied notation; often B). The converse holds for positive integers. The last digit records the address, never primality.
+2.  Additive: the supplied “octet + 3 ⋅ 2^(k) ladders” is a proposed representational construction. Its index range, repetition rules, and coverage assertion need an explicit formula before it is a theorem.
+3.  Generative: the Fi/Du candidate selector and its  + 2/ + 4 walk, also described as “3-rungs, −2/−1,” enumerate the wheel-6 addresses exactly.
+
+The width-eleven-flanks “rotation law” for a 2–3–5 sieve is also recorded as an OPEN instrument claim until width, rotation operation, and conserved quantity are defined. There is no mathematical last wheel at modulus 24 or 30: larger primorial wheels (e.g. 210) exist. The special all-units-square-to-1 property of 24 must not be generalized to arbitrary wheels. Historical attribution to Schatunowsky (1893), as given in the source series, requires bibliographic verification before being used as support for any “terminal wheel” claim.
+
+The dual register is a disciplined reporting convention: in ℤ, 3 is a prime; in the shape/register narrative, 3 is a measuring unit of the Fi/Du/Ci construction. The second use of “unit” is not the ring-theoretic statement that 3 is a unit in ℤ (it is not), and 3 is not in U(24). For each input, display its conventional number-theoretic verdict beside its stated shape role. “Every number has one true name” can mean a unique integer and residue address, or unique prime factorization of each integer  > 1, but these should not be conflated. DEFINED with classical mathematical boundaries.
+
+6. Π-box, mirror, tiling, and point shapes
+
+The Π-box. The supplied image [ ] [1] [2] [3] [ ] has three interior positions and two empty frame positions. If “span” counts all positions and “flesh” counts interior positions, then flesh = span − 2 by definition. This alone does not imply flesh or box counts are even: the displayed example has flesh 3 and span 5, both odd. The more specific assertion that a sequence of box counts is always even, and exactly resamples prime gaps, needs the counting function, endpoints, forward-walk/re-chunking rule, and an index-level identity. These statements are OPEN, not disproved in every possible formulation; the simple frame identity is DEFINED/PROVED.
+
+There is a provable conditional version worth testing against the intended instrument: for consecutive odd primes p_(i) < p_(i + 1), define flesh B_(i) = p_(i + 1) − p_(i) and total span S_(i) = B_(i) + 2. Then S_(i) − B_(i) = 2, B_(i) is even because both endpoints are odd, and the sequence (B_(i)) is exactly the odd-prime gap sequence. This is a coherent formalization, but it defines the box count using the gaps themselves; it does not yet establish that the supplied forward-walk independently produces B_(i). The exceptional first gap 2→3 equals 1. To claim the original box theorem, supply the forward-walk algorithm and prove that its output is B_(i) without taking that identity as the definition.
+
+Parity mirror. The centre-insertion arrangement around a 2–3 seed, with odd numbers on one arm and even numbers on the other, visualizes the first ×2 sieve cut: after 2, the even arm contains no primes; the odd arm still contains composites. This is a spatial representation, not an independent primality test. A formal drawing algorithm would make its exact indexing reproducible. Classical fact plus DEFINED visualization.
+
+Tile/no-tile law. For n > 1, a proper a × b rectangle with a, b > 1 exists exactly when n is composite. A prime supports only 1 × p or p × 1 integer rectangles. “Refusing to tile” is the framework’s apt visualization of this equivalence, not a distinct definition of primes. PROVED.
+
+The centered-square sequence 2k² − 2k + 1 begins 1, 5, 13, 25, 41, 61, …. It gives dot counts for a geometric construction; it does not imply compositeness. Indeed 5, 13, 41, and 61 are prime. The source wording suggesting these counts “index squares, which are composite by nature” must be dropped. A 4k + 1 arm or centered-square position can be a visual address, not an identity certificate. CORRECTED.
+
+Point shapes. The proposed drawing places p − 1 vertices around one centre, for p total points. This maps 5 to a square-plus-centre, 7 to a hexagon-plus-centre, 11 to a decagon-plus-centre, and 13 to a dodecagon-plus-centre. For 3, a “digon” is a degenerate two-vertex depiction in ordinary Euclidean polygon geometry. The later power-p Mandelbulb/lobe/axis correspondence is a proposed visual implementation; a mathematical commutation or lobe-count theorem requires an explicit map, symmetry action, and proof. Neither point count nor rendering establishes primality. DEFINED; 3-D claim OPEN.
+
+Honour rule and twinless six. These names, the endless-strip Π-box, forward-walk, and prime pyramid visualizer belong to the supplied instrument family. The source says the honour rule re-chunks a frame and produces an exceptional “twinless six,” but does not give enough formal input/output rules to test a unique claim. Preserve them as OPEN definitions/questions, not as proved prime theorems.
+
+Single-ingredient layer. Powers p^(k) of one prime, k ≥ 1, are prime powers. For k > 1 they are composite; the exponent measures distance along a chosen prime-power sequence. Unique factorization is classical. “Single-axis molecules” is a metaphor. PROVED/DEFINED.
+
+7. Fiduci opcode and belief-colour connection
+
+The supplied operational alphabet is the ordered eight-prime array
+
+F = [3,7,11,13,17,19,23,29].
+
+A 24-bit belief value can be split, in a specified high-to-low or low-to-high order, into eight three-bit groups; each group is an integer 0–7 and may index F. This yields an eight-instruction symbolic microsequence. It is a well-defined encoding once bit order and semantics are fixed, not an implication of a prime-distribution theorem.
+
+The supplied colour-rhythm vector G = [6,4,2,4,2,4,6,2] has an exact mathematical identification: the integers coprime to 30 in one cycle are U(30) = {1, 7, 11, 13, 17, 19, 23, 29}. Their successive gaps, including the wrap from 29 to 31 (the next 1 mod 30), are exactly 6, 4, 2, 4, 2, 4, 6, 2. The entries sum to 30. This is a PROVED wheel-30 gap identity. It is not the gaps of the mod-24 octet or of F as displayed: F substitutes 3 for the wheel-30 unit 1. Whether that substitution has an intended opcode meaning, and how a 24-bit colour selects or orders instructions, are design questions. The prime lens and belief-colour machine can share an alphabet by design without one proving properties of the other.
+
+8. Honesty doctrine: what follows and what does not
+
+“Perfect on addresses, counted on identity” accurately describes this instrument: its cheap walls characterize the candidate classes exactly, and its finite square-root interview makes every returned prime/composite verdict exact, while showing how many candidate divisions were actually performed. Its integrity is pedagogical and operational; its basic sieve facts are classical.
+
+The proven no-floor theorem rules out a fixed finite set of divisibility guards as a complete prime test. It does not establish that every exact test must trial-divide to sqrt(n), that deciding primality requires factoring, or that cryptographic security follows from this counter. In fact, Agrawal, Kayal, and Saxena proved an unconditional deterministic polynomial-time primality algorithm in the input bit length: PRIMES is in P, Annals of Mathematics 160 (2004), 781–793. That is compatible with this hand-auditable, deterministic trial-division machine, but rules out the unqualified “identity has no shortcut” or “no finite rule decides identity” formulations. The complexity of factoring and the security of deployed cryptography are separate questions.
+
+The statement that the final prime pattern has no fixed period is provable (section 4); it does not make every pattern in the visual instruments a theorem. Observed runs, including the failed guard-twin alternation, should remain explicitly recorded. Any claim of mathematical novelty, historical priority, or independent performance remains to be documented rather than inferred from an attractive presentation or a finite test.
+
+9. Proof and test register
+
+  Claim                                                        Status and evidence                                                                                                                     Next useful action
+  ------------------------------------------------------------ --------------------------------------------------------------------------------------------------------------------------------------- -----------------------------------------------------------------------------------------------
+  Fi/Du/Ci partition, candidate selector, 6k±1 necessity       PROVED, modular arithmetic                                                                                                              Compare address generation against wheel-6 and wheel-30 implementations
+  Digit sum preserves column, not primality                    PROVED; 25→7 and 997→25 are counterchecks                                                                                               Put both warnings beside glance output
+  Square-root interview gives exact verdict                    PROVED, factor bound                                                                                                                    Retain integer d² ≤ n and reproducible count semantics
+  Smallest new shadow of prime p at p²                         PROVED, with previous guards                                                                                                            Distinguish from first lane multiple
+  Finite guards first fail at next prime square                PROVED, with complete preceding prime guard set                                                                                         Write exclusive upper bound into wheel UI
+  Prime indicator has no eventual period                       PROVED, using prime p(1+T) contradiction                                                                                                Avoid extrapolation to algorithmic impossibility
+  Units mod 24 form C₂³; p² = 1 (mod  24) for p > 3            PROVED                                                                                                                                  Label exceptions 2 and 3
+  p² + 2 divisible by 3, p² − 2 survives walls for p > 3       PROVED; no identity prediction                                                                                                          Record 2,207 as break of proposed alternation
+  Five-gate agreement on all 2–10,000; all 0–1,000,000         TESTED, 9,999 comparisons against blunt division and 1,000,001 against independent Eratosthenes sieve, zero mismatches                  Publish implementation/test harness and precise input set
+  999,999,999,989 is prime under complete scan                 TESTED by exhaustive admissible divisions, 333,332 interviews                                                                           Retain transcript or executable certificate; do not assert sub-second speed without benchmark
+  Π-box even counts and exact gap resampling                   OPEN for supplied forward-walk; conditional definition B_(i) = p_(i + 1) − p_(i) proves evenness and gap identity for odd-prime pairs   Define the independent walk and prove its output equals B_(i)
+  Honour rule/twinless six, width rotation, additive ladders   OPEN: construction not fully specified                                                                                                  Give worked first ten outputs and formal recurrence
+  24-bit opcode decoding                                       DEFINED once bit order fixed                                                                                                            Specify index order, test round-trip and collision rules
+  Colour vector [6,4,2,4,2,4,6,2] as wheel-30 gaps             PROVED: successive gaps of 1, 7, 11, 13, 17, 19, 23, 29, with wrap 29→31                                                                Clarify why the opcode list uses 3 in place of wheel unit 1
+  Mandelbulb lobes follow point shapes                         OPEN as a theorem                                                                                                                       Specify formula, rotation action, and tested invariant
+
+10. A reproducible next-stage research protocol
+
+1.  Publish a minimal reference function with the five gates, exact counter semantics, first divisor, optional table flag, and a separate blunt reference implementation. Compare every input in an explicit range and sample adversarial cases p², products of nearby primes, and p² ± 2. Record integers, source version, and results; do not turn finite agreement into a universal novelty claim.
+2.  Define the Π-box mathematically: state the input prime sequence, frame endpoints, whether “span” counts endpoints, what “box count” counts, and the precise map to adjacent prime gaps. Test odd-gap exceptions around 2, then seek an algebraic proof or smallest counterexample.
+3.  Separate the 24-bit encoding’s design choices (bit orientation, opcode lookup, and the replacement of wheel-30 unit 1 by opcode 3) from the proved wheel-30 gap identity. A decoder/encoder round trip and an explicit mapping from gaps to instructions would settle the remaining ambiguity.
+4.  If efficiency is a research aim, compare the displayed candidate-interview count with a segmented sieve for enumerating many primes and with known deterministic primality algorithms for testing one large input. This asks a sharper question than claiming the count measures intrinsic factoring hardness.
+
+Provenance and attribution
+
+This text synthesizes the conversation’s descriptions of The Deterministic Prime Methodology, The Box Methodology and the Deterministic Prime Calculator, and The Digit-Sum Column Sort and the Reduction Under 32, together with the four user-supplied PDFs: The Fiduci Prime Lens — Box Method, Fully Explained; The Fiduci Prime Lens II — Tri-Parity, the Register & the Wheel, Fully Explained; The Fiduci Prime Lens III — Closing Laws & the Prime Calculator, Fully Explained; and The Fiduci Prime Lens — Final Landing & Use Cases (Series Capstone). The PDFs identify Joe Smith / Fiduci Group and dates in June and July 2026. Names, metaphors, purported authorship, and instrument designs are retained as represented by those supplied sources; no independent priority or ownership investigation has been performed. Classical scaffolding includes the sieve of Eratosthenes, modular arithmetic/CRT, wheel filters, unique factorization, and trial division. The proof statuses in this manuscript concern mathematical validity of the explicitly stated claims, not historical originality.
